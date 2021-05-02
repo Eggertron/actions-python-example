@@ -1,3 +1,5 @@
 # Example Hello world
 
-print("Hello World.")
+class Hello():
+  def say_hello():
+    print("Hello World.")
