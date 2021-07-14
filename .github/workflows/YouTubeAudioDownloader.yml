@@ -2,10 +2,10 @@ name: YouTube Audio Downloader
 on: 
   workflow_dispatch:
       inputs:
-          name:
+          yt_url:
               description: 'YouTube URL'
               required: true
-              default: 'YouTube URL'
+              default: 'https://youtu.be/k6_QVvx6gpc'
 
 jobs:
   get_youtube_audio:
@@ -18,4 +18,21 @@ jobs:
         sudo apt-get install -y vlc jq 1>/dev/null
         export vlc_lib="$( whereis vlc | awk '{ print $3 }' )/lua/playlist"
         echo "vlc lib location: ${vlc_lib}"
+    - name: Update VLC
+      run: |
+          echo "vlc lib location: ${vlc_lib}"
+          export yt_lib_dir="$( whereis vlc | awk '{ print $3 }' )/lua/playlist"
+          export yt_lua_url="https://raw.githubusercontent.com/videolan/vlc/master/share/lua/playlist/youtube.lua"
+          curl -L "${yt_lua_url}" -o "${yt_lib_dir}/youtube.lua"
+    - name: Download Audio
+      run: |
+          echo "vlc lib location: ${vlc_lib}"
+          export TITLE=`curl -L $1 | grep -o -P '(?<=<title>).*(?=</title>)'`
+          echo "Downloading ${TITLE} as mp3..."
+          export TRANSCODEMP3="#transcode{acodec=mp3,ab=128,channels=2,samplerate=44100}:std{access=file,mux=raw,dst=output.mp3}"
+          export PARAMS='-I dummy --no-sout-video --sout-audio --no-sout-rtp-sap --no-sout-standard-sap --ttl=1 --sout-keep --sout '$TRANSCODEMP3' '${{ github.event.inputs.yt_url }}' vlc://quit'
+          vlc ${PARAMS}
+          mv output.mp3 "$TITLE.mp3"
+          echo "File saved as $TITLE.mp3"
+
 
