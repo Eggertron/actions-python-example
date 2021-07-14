@@ -37,7 +37,7 @@ jobs:
           export fuid=$(curl 'https://up.ufile.io/v1/upload/create_session' -d "file_size=${file_size}" | jq '.fuid')
           echo "FUID: ${fuid}"
           curl 'https://up.ufile.io/v1/upload/chunk' -F 'chunk_index=1' -F "fuid=${fuid}" -F "file=@${TITLE}.mp3"
-          export results=$(curl 'https://up.ufile.io/v1/upload/finalise' -d "fuid=${fuid}" -d "file_name=${TITLE}" -d 'file_type=mp3' -d 'total_chunks=1')
+          export results=$(curl 'https://up.ufile.io/v1/upload/finalise' -d "fuid=${fuid}" -d "file_name=${TITLE}.mp3" -d 'file_type=mp3' -d 'total_chunks=1')
           echo "Results: ${results}"
-          echo "${results}" | jp '.url'
+          echo "${results}" | jq '.url'
 
