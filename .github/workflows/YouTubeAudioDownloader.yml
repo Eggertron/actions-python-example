@@ -22,5 +22,5 @@ jobs:
       run: |
         ls ${{ github.workspace }}
     - run: echo "🍏 This job's status is ${{ job.status }}."
-    - run: apt-get update && apt-get install vlc
+    - run: sudo apt-get update && sudo apt-get install vlc
     - run: whereis vlc
