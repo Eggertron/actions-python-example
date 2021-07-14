@@ -15,7 +15,7 @@ jobs:
       run: |
         ls ${{ github.workspace }}
         echo "🍏 This job's status is ${{ job.status }}."
-        sudo apt-get install -y vlc jq
+        sudo apt-get install -y vlc jq 1>/dev/null
         export vlc_lib="$( whereis vlc | awk '{ print $3 }' )/lua/playlist"
         echo "vlc lib location: ${vlc_lib}"
 
