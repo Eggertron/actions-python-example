@@ -13,8 +13,6 @@ jobs:
     steps:
     - name: Install Dependencies
       run: |
-        ls ${{ github.workspace }}
-        echo "🍏 This job's status is ${{ job.status }}."
         sudo apt-get install -y vlc jq 1>/dev/null
         export vlc_lib="$( whereis vlc | awk '{ print $3 }' )/lua/playlist"
         echo "vlc lib location: ${vlc_lib}"
@@ -27,7 +25,7 @@ jobs:
     - name: Download Audio
       run: |
           echo "vlc lib location: ${vlc_lib}"
-          export TITLE=`curl -L $1 | grep -o -P '(?<=<title>).*(?=</title>)'`
+          export TITLE=`curl -L ${{ github.event.inputs.yt_url }} | grep -o -P '(?<=<title>).*(?=</title>)'`
           echo "Downloading ${TITLE} as mp3..."
           export TRANSCODEMP3="#transcode{acodec=mp3,ab=128,channels=2,samplerate=44100}:std{access=file,mux=raw,dst=output.mp3}"
           export PARAMS='-I dummy --no-sout-video --sout-audio --no-sout-rtp-sap --no-sout-standard-sap --ttl=1 --sout-keep --sout '$TRANSCODEMP3' '${{ github.event.inputs.yt_url }}' vlc://quit'
@@ -36,5 +34,10 @@ jobs:
           echo "File saved as $TITLE.mp3"
           export file_size=$(du -b "${TITLE}.mp3" | awk '{ print $1 }')
           echo "File size: ${file_size}"
-
+          export fuid=$(curl 'https://up.ufile.io/v1/upload/create_session' -d "file_size=${file_size}" | jq '.fuid')
+          echo "FUID: ${fuid}"
+          curl 'https://up.ufile.io/v1/upload/chunk' -F 'chunk_index=1' -F "fuid=${fuid}" -F "file=@${TITLE}.mp3"
+          export results=$(curl 'https://up.ufile.io/v1/upload/finalise' -d "fuid=${fuid}" -d "file_name=${TITLE}" -d 'file_type=mp3' -d 'total_chunks=1')
+          echo "Results: ${results}"
+          echo "${results}" | jp '.url'
 
