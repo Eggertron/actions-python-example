@@ -1,7 +1,14 @@
-name: Pytest on push demo
-on: [push]
+name: YouTube Audio Downloader
+on: 
+  workflow_dispatch:
+      inputs:
+          name:
+              description: 'YouTube URL'
+              required: true
+              default: 'YouTube URL'
+
 jobs:
-  Explore-GitHub-Actions:
+  get_youtube_audio:
     runs-on: ubuntu-latest
     steps:
     - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
@@ -15,5 +22,5 @@ jobs:
       run: |
         ls ${{ github.workspace }}
     - run: echo "🍏 This job's status is ${{ job.status }}."
-    - run: pip install pytest
-    - run: pytest
+    - run: apt-get update && apt-get install vlc
+    - run: whereis vlc
