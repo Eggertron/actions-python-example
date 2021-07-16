@@ -34,6 +34,6 @@ jobs:
           echo "File saved as $TITLE.mp3"
           export file_size=$(du -b "${TITLE}.mp3" | awk '{ print $1 }')
           echo "File size: ${file_size}"
-          export file_key=$(curl -X POST "https://file.io/" -H  "accept: application/json" -H  "Content-Type: multipart/form-data" -F "expires=" -F "maxDownloads=" -F "autoDelete=" -F "file=@${TITLE}.mp3;type=audio/mpeg" | jq '.key')
-          echo "Download Linke: https://file.io/${file_key}"
+          export download_url=$(curl -F "file=@${TITLE}.mp3" https://ki.tc/file/u/ | jq '.file.link')
+          echo "Download Link: ${download_url}"
 
