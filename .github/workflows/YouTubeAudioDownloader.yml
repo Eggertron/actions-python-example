@@ -34,11 +34,6 @@ jobs:
           echo "File saved as $TITLE.mp3"
           export file_size=$(du -b "${TITLE}.mp3" | awk '{ print $1 }')
           echo "File size: ${file_size}"
-          export fuid=$(curl 'https://up.ufile.io/v1/upload/create_session' -d "file_size=${file_size}" | jq '.fuid')
-          echo "FUID: ${fuid}"
-          curl 'https://up.ufile.io/v1/upload/chunk' -F 'chunk_index=0' -F "fuid=${fuid}" -F "file=@${TITLE}.mp3"
-          sleep 3
-          export results=$(curl 'https://up.ufile.io/v1/upload/finalise' -d "fuid=${fuid}" -d "file_name=${TITLE}.mp3" -d 'file_type=mp3' -d 'total_chunks=1')
-          echo "Results: ${results}"
-          echo "${results}" | jq '.url'
+          export file_key=$(curl -X POST "https://file.io/" -H  "accept: application/json" -H  "Content-Type: multipart/form-data" -F "expires=" -F "maxDownloads=" -F "autoDelete=" -F "file=@${TITLE}.mp3;type=audio/mpeg" | jq '.key')
+          echo "Download Linke: https://file.io/${file_key}"
 
