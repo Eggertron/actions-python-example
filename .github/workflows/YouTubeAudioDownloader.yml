@@ -26,6 +26,7 @@ jobs:
       run: |
           echo "vlc lib location: ${vlc_lib}"
           export TITLE=`curl -L ${{ github.event.inputs.yt_url }} | grep -o -P '(?<=<title>).*(?=</title>)' | sed 's/\ /_/g'`
+          export TITLE=output.mp3
           echo "Downloading ${TITLE} as mp3..."
           export TRANSCODEMP3="#transcode{acodec=mp3,ab=128,channels=2,samplerate=44100}:std{access=file,mux=raw,dst=output.mp3}"
           export PARAMS='-I dummy --no-sout-video --sout-audio --no-sout-rtp-sap --no-sout-standard-sap --ttl=1 --sout-keep --sout '$TRANSCODEMP3' '${{ github.event.inputs.yt_url }}' vlc://quit'
